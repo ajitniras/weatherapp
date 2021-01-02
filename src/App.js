@@ -1,23 +1,63 @@
-import logo from './logo.svg';
+import React , { useState }from "react";
+import DisplayWeather from "./DisplayWeather";
 import './App.css';
 
 function App() {
+
+
+    const APIKEY ="5a5cb8a81aa02c74cb19d3ba25a586eb";
+
+    const [form, setForm] = useState({
+      city:"",
+
+    });
+
+    const [weather, setWeather] = useState([])
+
+    async function weatherdata(e){
+      e.preventDefault();
+      if (form.city==""){
+        alert("Add City");
+      }
+      else{
+        const data = await fetch( `https://api.openweathermap.org/data/2.5/weather?q=${form.city}&APPID=${APIKEY}`)
+        .then(res=>res.json()
+        .then((data)=>data));
+
+        setWeather({data : data});
+      }
+    }
+
+
+  const handelChange=(e)=>{
+    let name=e.target.name;
+    let value=e.target.value;
+
+      if (name == "city"){
+        setForm({...form, city:value});
+      }
+      console.log(form.city);
+
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Weather App</h1>
+      <form>
+        <input type="text" placeholder="City" name="city" className="input" onChange={(e)=>handelChange(e)}/>
+        <br/>
+        <br/>
+        <button className="submit" onClick={(e)=>weatherdata(e)}>Get Details</button>
+      </form>
+
+      {weather.data != undefined ? (
+        <div>
+          <DisplayWeather data={weather.data} />
+        </div>
+      ) : null}
+
+
+
     </div>
   );
 }
